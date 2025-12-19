@@ -8,5 +8,7 @@ dependencies = [
     "django>=6.0",
     "django-filter>=25.2",
     "djangorestframework>=3.16.1",
+    "djangorestframework-xml>=2.0.0",
+    "djoser>=2.3.3",
     "markdown>=3.10",
 ]
