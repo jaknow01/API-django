@@ -1,7 +1,7 @@
 # Little Lemon Restaurant API Project
 
 ## Project Overview
-This project involves building a RESTful API for the Little Lemon restaurant, focusing on user roles and functionalities for managers, customers, and delivery personnel.
+This project involves building a RESTful API for the Little Lemon restaurant, focusing on user roles and functionalities for managers, customers, and delivery personnel. This is the final project from Meta's APIs course available on Coursera [link](https://www.coursera.org/learn/apis?specialization=meta-full-stack-developer).
 
 ## User Roles
 - **Managers**
