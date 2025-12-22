@@ -137,5 +137,11 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
-    "USER_ID_FIELD": "username"
+    "USER_ID_FIELD": "username",
+    "PERMISSIONS": {
+        "user_list": ["rest_framework.permissions.IsAdminUser"],
+        "user": ["rest_framework.permissions.IsAuthenticated"],
+        "user_me": ["rest_framework.permissions.IsAuthenticated"],
+        "user_create": ["rest_framework.permissions.AllowAny"],
+    }
 }
