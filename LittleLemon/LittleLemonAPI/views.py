@@ -88,3 +88,16 @@ class CartView(viewsets.ViewSet):
         items = Cart.objects.filter(user=request.user)
         serializer = CartSerializer(items)
         return Response(serializer.data)
+    
+    def create(self, request):
+        serializer = CartSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def destroy(self, request):
+        Cart.objects.filter(user=request.user).delete()
+        return Response(
+            {'message': 'deleted cart'},
+            status=status.HTTP_200_OK
+        )

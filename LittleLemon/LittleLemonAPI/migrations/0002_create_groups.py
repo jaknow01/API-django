@@ -1,6 +1,6 @@
 from django.db import migrations
 
-def create_user_groups(apps, schema_editor):
+def create_user_groups(apps):
     Group = apps.get_model('auth', 'Group')
     Group.objects.get_or_create(name='managers')
     Group.objects.get_or_create(name='delivery')
