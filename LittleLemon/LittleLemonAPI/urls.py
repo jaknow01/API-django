@@ -37,6 +37,6 @@ urlpatterns = [
         {
             'delete': 'destroy'
         }
-    ))
-    
+    )),
+    path('/cart/manu-items', )
 ]

@@ -5,9 +5,9 @@ from rest_framework import status, viewsets
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 
-from .models import MenuItem
-from .serializers import MenuItemSerializer
-from .permissions import MenuItemPermission, ManagementPermission
+from .models import MenuItem, Cart, Order
+from .serializers import MenuItemSerializer, CartSerializer
+from .permissions import MenuItemPermission, ManagementPermission, CustomerPermission
 
 
 # Create your views here.
@@ -80,3 +80,11 @@ class GroupDeliveryView(viewsets.ViewSet):
             },
             status=status.HTTP_200_OK
         )
+    
+class CartView(viewsets.ViewSet):
+    permission_classes = [CustomerPermission]
+
+    def list(self, request):
+        items = Cart.objects.filter(user=request.user)
+        serializer = CartSerializer(items)
+        return Response(serializer.data)

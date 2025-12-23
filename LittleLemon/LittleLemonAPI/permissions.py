@@ -16,3 +16,10 @@ class ManagementPermission(BasePermission):
             request.is_authenticated and
             request.user.groups.filter(name="managers").exists()
         )
+    
+class CustomerPermission(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.is_authenticated and
+            request.user.groups.filter(name="customers").exists()
+        )
