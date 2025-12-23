@@ -16,6 +16,9 @@ class CartSerializer(serializers.ModelSerializer):
     )
     
     def validate(self, attrs):
+        menuitem = attrs['menuitem']
+        attrs['unit_price'] = menuitem.price
+        
         attrs['price'] = attrs['quantity'] * attrs['unit_price']
         return attrs
 

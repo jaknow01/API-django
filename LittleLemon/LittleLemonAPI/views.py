@@ -1,12 +1,11 @@
-from django.shortcuts import render
-from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, viewsets
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 
-from .models import MenuItem, Cart, Order
-from .serializers import MenuItemSerializer, CartSerializer
+from .models import MenuItem, Cart, Order, OrderItem
+from .serializers import MenuItemSerializer, CartSerializer, OrderSerializer
 from .permissions import MenuItemPermission, ManagementPermission, CustomerPermission
 
 
@@ -101,3 +100,52 @@ class CartView(viewsets.ViewSet):
             {'message': 'deleted cart'},
             status=status.HTTP_200_OK
         )
+    
+class OrderView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        user = request.user
+
+        if user.groups.filter(name='manager').exists():
+            orders = Order.objects.all()
+        elif user.groups.filter(name='delivery').exists():
+            orders = Order.objects.filter(delivery_crew=user)
+        else:
+            orders = Order.objects.filter(user=user)
+
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+    
+    def create(self, request):
+        if not request.user.groups.filter(name='customer').exists():
+            return Response(
+                {"error": "Only customers can create orders"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        cart = Cart.objects.filter(user=request.user)
+        if not cart:
+            return Response(
+                {"message": "Cart is empty"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        order = Order.objects.create(user=request.user)
+
+        for item in cart:
+            OrderItem.objects.create(
+                order=order,
+                menuitem=item.menuitem,
+                quantity=item.quantity,
+                unit_price=item.unit_price,
+                price=item.price
+            )
+        
+        order.total = sum(item.price for item in order.order_items.all())
+
+        cart.delete()
+        serializer = OrderSerializer(order)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+    

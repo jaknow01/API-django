@@ -2,13 +2,13 @@ from django.urls import path
 from .views import MenuItemsView, GroupManagementView, GroupDeliveryView, CartView
 
 urlpatterns = [
-    path("menu-items/", MenuItemsView.as_view(
+    path("/menu-items", MenuItemsView.as_view(
         {
             'get': 'list',
             'post': 'create'
         }
     )),
-    path("menu-items/<int:pk>", MenuItemsView.as_view(
+    path("/menu-items/<int:pk>", MenuItemsView.as_view(
         {
             'get': 'retrieve',
             'put': 'update',
@@ -16,13 +16,13 @@ urlpatterns = [
             'delete': 'destroy',
         }
     )),
-    path('groups/manager/users/', GroupManagementView.as_view(
+    path('/groups/manager/users', GroupManagementView.as_view(
         {
             'get': 'list',
             'post': 'create'
         }
     )),
-    path('groups/manager/users/<int:pk>', GroupManagementView.as_view(
+    path('/groups/manager/users/<int:pk>', GroupManagementView.as_view(
         {
             'delete': 'destroy'
         }
@@ -44,5 +44,7 @@ urlpatterns = [
             'post': 'create',
             'delete': 'destroy'
         }
-    ))
+    )),
+    path('/orders'),
+    path('/orders/<int:pk>')
 ]
