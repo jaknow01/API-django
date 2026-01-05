@@ -21,7 +21,7 @@ def create_user(db):
 
 @pytest.fixture
 def customer_user(create_user):
-    return create_user(username='customer', groups=['customer'])
+    return create_user(username='customer', groups=['customers'])
 
 @pytest.fixture
 def manager_user(create_user):

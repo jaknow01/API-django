@@ -10,21 +10,24 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        default=serializers.CurrentUserDefault()
-    )
+    unit_price = serializers.DecimalField(max_digits=6, decimal_places=2, read_only=True)
+    price = serializers.DecimalField(max_digits=6, decimal_places=2, read_only=True)
     
-    def validate(self, attrs):
-        menuitem = attrs['menuitem']
-        attrs['unit_price'] = menuitem.price
-        
-        attrs['price'] = attrs['quantity'] * attrs['unit_price']
-        return attrs
-
     class Meta:
         model = Cart
         fields = ['id', 'user', 'menuitem', 'quantity', 'unit_price', 'price']
+        read_only_fields = ['user', 'unit_price', 'price']
+    
+    def create(self, validated_data):
+        # Automatycznie pobierz cenę z MenuItem
+        menuitem = validated_data['menuitem']
+        quantity = validated_data['quantity']
+        
+        validated_data['unit_price'] = menuitem.price
+        validated_data['price'] = menuitem.price * quantity
+        validated_data['user'] = self.context['request'].user
+        
+        return super().create(validated_data)
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
