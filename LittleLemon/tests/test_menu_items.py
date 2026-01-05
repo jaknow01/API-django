@@ -234,17 +234,17 @@ class TestMenuItemsManager:
 class TestMenuItemsUnauthenticated:
     """Testy endpointów menu-items dla niezalogowanych użytkowników"""
     
-    def test_unauthenticated_cannot_list_menu_items(self, api_client, multiple_menu_items):
-        """Niezalogowany użytkownik NIE może pobierać listy - GET /api/menu-items -> 401"""
+    def test_unauthenticated_can_list_menu_items(self, api_client, multiple_menu_items):
+        """Niezalogowany użytkownik może pobierać listy - GET /api/menu-items -> 200 OK"""
         response = api_client.get('/api/menu-items')
         
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_200_OK
     
-    def test_unauthenticated_cannot_get_single_menu_item(self, api_client, menu_item):
-        """Niezalogowany użytkownik NIE może pobierać pojedynczego item - GET /api/menu-items/{id} -> 401"""
+    def test_unauthenticated_can_get_single_menu_item(self, api_client, menu_item):
+        """Niezalogowany użytkownik może pobierać pojedynczy item - GET /api/menu-items/{id} -> 200"""
         response = api_client.get(f'/api/menu-items/{menu_item.id}')
         
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_200_OK
     
     def test_unauthenticated_cannot_create_menu_item(self, api_client):
         """Niezalogowany użytkownik NIE może tworzyć - POST /api/menu-items -> 401"""

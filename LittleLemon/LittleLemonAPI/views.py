@@ -11,7 +11,7 @@ from .permissions import MenuItemPermission, ManagementPermission, CustomerPermi
 
 # Create your views here.
 class MenuItemsView(viewsets.ModelViewSet):
-    queryset = MenuItem.objects.all()
+    queryset = MenuItem.objects.all().order_by("id")
     serializer_class = MenuItemSerializer
     permission_classes = [MenuItemPermission]
 
