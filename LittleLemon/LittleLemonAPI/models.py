@@ -2,11 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Create your models here.
+class Category(models.Model):
+    slug = models.SlugField()
+    title = models.CharField(max_length=255, db_index=True)
 
 class MenuItem(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
-
+    featured = models.BooleanField(db_index=True, default=False)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, blank=True)
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -14,6 +18,9 @@ class Cart(models.Model):
     quantity = models.SmallIntegerField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    class Meta:
+        unique_together = ('menuitem', 'user')
 
 
 class Order(models.Model):
@@ -36,5 +43,8 @@ class OrderItem(models.Model):
     quantity = models.SmallIntegerField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    class Meta:
+        unique_together = ('order', 'menuitem')
 
 
