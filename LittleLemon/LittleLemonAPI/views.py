@@ -115,6 +115,9 @@ class OrderView(viewsets.ModelViewSet):
             return Order.objects.filter(user=user)
         
     def update(self, request, *args, **kwargs):
+        if kwargs.get("partial"):
+            return super().update(request, *args, **kwargs)
+
         if not request.user.groups.filter(name='managers').exists():
             return Response(
                 {"error": "Only managers can update orders"},
@@ -123,11 +126,17 @@ class OrderView(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
     
     def partial_update(self, request, *args, **kwargs):
+        print(f"User: {request.user.username}")
+        print(f"Groups: {list(request.user.groups.values_list('name', flat=True))}")
+        print(request.user.groups.filter(name='delivery').exists())
+        print(set(request.data.keys()) != {'status'})
+        print(set(request.data.keys()))
+
         if request.user.groups.filter(name='managers').exists():
             return super().partial_update(request, *args, **kwargs)
         
         elif request.user.groups.filter(name='delivery').exists():
-            if 'status' != set(request.data.keys()):
+            if set(request.data.keys()) != {'status'}:
                 return Response(
                     {"error": "Delivery crew can only update status"},
                     status = status.HTTP_403_FORBIDDEN
@@ -164,10 +173,10 @@ class OrderView(viewsets.ModelViewSet):
             )
         
         cart = Cart.objects.filter(user=request.user)
-        if not cart:
+        if not cart.exists():
             return Response(
                 {"message": "Cart is empty"},
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_400_BAD_REQUEST
             )
         order = Order.objects.create(user=request.user)
 
@@ -181,6 +190,7 @@ class OrderView(viewsets.ModelViewSet):
             )
         
         order.total = sum(item.price for item in order.order_items.all())
+        order.save()
 
         cart.delete()
         serializer = OrderSerializer(order)

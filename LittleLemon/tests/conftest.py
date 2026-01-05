@@ -6,4 +6,5 @@ pytest_plugins = [
     'tests.fixtures.users',
     'tests.fixtures.menu_items',
     'tests.fixtures.cart',
+    'tests.fixtures.orders',
 ]
