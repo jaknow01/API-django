@@ -20,7 +20,7 @@ class GroupManagementView(viewsets.ViewSet):
     permission_classes = [ManagementPermission]
 
     def list(self, request):
-        managers = User.objects.filter(groups__name='manager')
+        managers = User.objects.filter(groups__name='managers')
         return Response([{"id": u.id, "username": u.username, "email": u.email} for u in managers])
     
     def create(self, request):
@@ -79,13 +79,13 @@ class GroupDeliveryView(viewsets.ViewSet):
             },
             status=status.HTTP_200_OK
         )
-    
+
 class CartView(viewsets.ViewSet):
     permission_classes = [CustomerPermission]
 
     def list(self, request):
         items = Cart.objects.filter(user=request.user)
-        serializer = CartSerializer(items)
+        serializer = CartSerializer(items, many=True)
         return Response(serializer.data)
     
     def create(self, request):
@@ -101,21 +101,60 @@ class CartView(viewsets.ViewSet):
             status=status.HTTP_200_OK
         )
     
-class OrderView(viewsets.ViewSet):
+class OrderView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
 
-    def list(self, request):
-        user = request.user
-
-        if user.groups.filter(name='manager').exists():
-            orders = Order.objects.all()
+    def get_queryset(self):
+        user = self.request.user
+        if user.groups.filter(name='managers').exists():
+            return Order.objects.all()
         elif user.groups.filter(name='delivery').exists():
-            orders = Order.objects.filter(delivery_crew=user)
+            return Order.objects.filter(delivery_crew=user)
         else:
-            orders = Order.objects.filter(user=user)
+            return Order.objects.filter(user=user)
+        
+    def update(self, request, *args, **kwargs):
+        if not request.user.groups.filter(name='managers').exists():
+            return Response(
+                {"error": "Only managers can update orders"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        if request.user.groups.filter(name='managers').exists():
+            return super().partial_update(request, *args, **kwargs)
+        
+        elif request.user.groups.filter(name='delivery').exists():
+            if 'status' != set(request.data.keys()):
+                return Response(
+                    {"error": "Delivery crew can only update status"},
+                    status = status.HTTP_403_FORBIDDEN
+                )
+    
+            order_status = request.data.get("status")
+            if order_status not in [0, 1, True, False]:
+                return Response(
+                    {"error": "Status must be 0, 1, true, or false"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            return super().partial_update(request, *args, **kwargs)
+        
+        else:
+            return Response(
+                {'error': 'Customers cant update orders'},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
-        serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data)
+    def destroy(self, request, *args, **kwargs):
+        if not request.user.groups.filter(name='managers').exists():
+            return Response(
+                {"error": "Only managers can delete orders"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().destroy(request, *args, **kwargs)
     
     def create(self, request):
         if not request.user.groups.filter(name='customer').exists():
@@ -147,5 +186,7 @@ class OrderView(viewsets.ViewSet):
         serializer = OrderSerializer(order)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+
         
     
