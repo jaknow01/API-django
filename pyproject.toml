@@ -11,4 +11,6 @@ dependencies = [
     "djangorestframework-xml>=2.0.0",
     "djoser>=2.3.3",
     "markdown>=3.10",
+    "pytest>=9.0.2",
+    "pytest-django>=4.11.1",
 ]
