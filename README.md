@@ -38,4 +38,15 @@ This project involves building a RESTful API for the Little Lemon restaurant, fo
 
 ## Development Tools
 - **Framework**: Django with Django REST framework (DRF)
-- **Testing Tool**: Insomnia
+- **Testing Tool**: Insomnia, Pytest
+
+## How to run
+```
+pip install uv
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+```
+
+## How to run tests
+You can either use tools like Insomnia to send your own requests or check out pre-made tests in LittleLemon/tests
