@@ -4,8 +4,8 @@ from rest_framework import status, viewsets
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 
-from .models import MenuItem, Cart, Order, OrderItem
-from .serializers import MenuItemSerializer, CartSerializer, OrderSerializer
+from .models import MenuItem, Cart, Order, OrderItem, Category
+from .serializers import MenuItemSerializer, CartSerializer, OrderSerializer, CategorySerializer
 from .permissions import MenuItemPermission, ManagementPermission, CustomerPermission
 
 
@@ -14,7 +14,13 @@ class MenuItemsView(viewsets.ModelViewSet):
     queryset = MenuItem.objects.all().order_by("id")
     serializer_class = MenuItemSerializer
     permission_classes = [MenuItemPermission]
+    ordering_fields = ['price']
+    filterset_fields = ['category']
 
+class CategoryView(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [MenuItemPermission]
 
 class GroupManagementView(viewsets.ViewSet):
     permission_classes = [ManagementPermission]

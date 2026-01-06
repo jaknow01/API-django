@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import MenuItemsView, GroupManagementView, GroupDeliveryView, CartView, OrderView
+from .views import MenuItemsView, GroupManagementView, GroupDeliveryView, CartView, OrderView, CategoryView
 
 urlpatterns = [
     path("menu-items", MenuItemsView.as_view(
@@ -58,5 +58,19 @@ urlpatterns = [
             'patch': 'partial_update',
             'delete': 'destroy',
         }
-    ))
+    )),
+    path('categories', CategoryView.as_view(
+        {
+            'get': 'list',
+            'post': 'create'
+        }
+    )),
+    path('categories/<int:pk>', CategoryView.as_view(
+        {
+            'get': 'retrieve',
+            'put': 'update',
+            'patch': 'partial_update',
+            'delete': 'destroy',
+        }
+    )),
 ]

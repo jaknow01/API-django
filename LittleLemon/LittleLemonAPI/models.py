@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     slug = models.SlugField()
     title = models.CharField(max_length=255, db_index=True)
+    
+    class Meta:
+        ordering = ['id']
 
 class MenuItem(models.Model):
     name = models.CharField(max_length=100, db_index=True)
@@ -35,6 +38,9 @@ class Order(models.Model):
     status = models.BooleanField(default=0, db_index=True)
     total = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     date = models.DateField(db_index=True, auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-date', 'id']
 
 
 class OrderItem(models.Model):
